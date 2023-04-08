@@ -22,6 +22,10 @@ export default {
             const form = useForm({
                 file,
             });
+            if (!file) {
+                alert("Please select a file");
+                return;
+            }
             form.post(route("file.upload"), {
                 onSuccess: () => form.reset(),
                 onError: () => {
