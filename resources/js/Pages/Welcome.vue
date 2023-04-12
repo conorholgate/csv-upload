@@ -1,12 +1,74 @@
 <template>
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="flex flex-col items-center">
-            <form @submit.prevent="uploadFile" enctype="multipart/form-data">
-                <input type="file" ref="fileInput" accept=".csv" />
-                <button type="submit">Upload CSV</button>
-            </form>
+    <form @submit.prevent="uploadFile" enctype="multipart/form-data">
+        <div
+            class="flex flex-col items-center justify-center min-h-screen gap-10 bg-gray-200"
+        >
+            <div
+                class="flex flex-col w-[50%] h-[50%] max-w-[900px] max-h-[700px]"
+            >
+                <div
+                    class="flex flex-col items-center p-4 rounded-lg bg-gray-50 min-w-[300px]"
+                >
+                    <div
+                        class="flex flex-col justify-between w-full h-24 mb-5 text-gray-600 self-baseline"
+                    >
+                        <h1 class="text-xl">Files Upload</h1>
+                        <div class="flex justify-between">
+                            <div class="flex items-center w-full">
+                                Files allowed:
+                                <span
+                                    ><img
+                                        class="w-12 h-12 ml-2"
+                                        src="../../assets/csv-icon.png"
+                                        alt=""
+                                /></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        @dragover.prevent
+                        @dragenter="onDragEnter"
+                        @dragleave="onDragLeave"
+                        @drop="onFileDropped"
+                        class="z-50 mb-10 flex items-center text-center justify-center w-full p-4 text-2xl text-gray-400 bg-white border-4 border-dashed border-blue-400 rounded-lg h-[400px]"
+                        :class="{
+                            isDragging: isDragging,
+                            hasFile: fileName && !isDragging,
+                        }"
+                    >
+                        <input
+                            type="file"
+                            name="file"
+                            id="file"
+                            hidden
+                            ref="fileInput"
+                            @change="onChange"
+                            accept=".csv"
+                        />
+                        {{
+                            fileName
+                                ? fileName
+                                : "Drag & drop here or select file below"
+                        }}
+                    </div>
+                    <div class="flex justify-between w-full">
+                        <label
+                            class="w-48 px-4 py-2 mr-2 text-lg text-center text-white bg-blue-400 rounded-lg cursor-pointer hover:bg-blue-600"
+                            for="file"
+                            >Select file</label
+                        >
+                        <button
+                            type="submit"
+                            :disabled="!fileName"
+                            class="w-48 px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer hover:bg-green-600 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
+                        >
+                            Upload
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </template>
 
 <script>
@@ -16,42 +78,68 @@ import { ref } from "vue";
 export default {
     setup() {
         const fileInput = ref(null);
+        const file = ref(null);
+        const isDragging = ref(false);
+        const fileName = ref(null);
 
+        const onDragEnter = (event) => {
+            isDragging.value = true;
+        };
+        const onDragLeave = (event) => {
+            isDragging.value = false;
+        };
+        const onFileDropped = (event) => {
+            setFile(event);
+            isDragging.value = false;
+        };
+        const onChange = (event) => {
+            setFile(event);
+        };
+        const setFile = (event) => {
+            event.preventDefault();
+            const { files } = event.dataTransfer || event.target;
+            file.value = files[0];
+            fileName.value = files[0].name;
+            console.log(file.value);
+        };
         const uploadFile = () => {
-            const file = fileInput.value.files[0];
             const form = useForm({
                 file,
             });
-            if (!file) {
-                alert("Please select a file");
-                return;
-            }
-            form.post(route("file.upload"), {
-                onSuccess: () => form.reset(),
-                onError: () => {
-                    console.log("error");
-                },
-            });
+            form.post(route("file.upload"));
         };
 
         return {
             uploadFile,
             fileInput,
+            file,
+            isDragging,
+            fileName,
+            onFileDropped,
+            onDragEnter,
+            onDragLeave,
+            onChange,
         };
     },
 };
 </script>
 
 <style>
-.bg-dots-darker {
-    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.22676 0C1.91374 0 2.45351 0.539773 2.45351 1.22676C2.45351 1.91374 1.91374 2.45351 1.22676 2.45351C0.539773 2.45351 0 1.91374 0 1.22676C0 0.539773 0.539773 0 1.22676 0Z' fill='rgba(0,0,0,0.07)'/%3E%3C/svg%3E");
+/* .hidden-input {
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+} */
+.isDragging {
+    background: rgba(96, 165, 250, 0.556);
+    border-color: rgb(96 165 250);
+    color: white;
 }
-button {
-    border: 1px solid black;
-    border-radius: 8px;
-    padding: 4px 8px;
-}
-button:hover {
-    background: rgb(228, 228, 228);
+.hasFile {
+    background: #6ee7b7;
+    color: white;
+    border-color: #10b981;
 }
 </style>
