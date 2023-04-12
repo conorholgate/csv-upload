@@ -53,14 +53,14 @@
                     </div>
                     <div class="flex justify-between w-full">
                         <label
-                            class="w-48 px-4 py-2 mr-2 text-lg text-center text-white bg-blue-400 rounded-lg cursor-pointer hover:bg-blue-600"
+                            class="w-48 px-4 py-2 mr-2 text-lg text-center text-white bg-blue-400 rounded-lg cursor-pointer hover:bg-blue-600 active:bg-blue-900"
                             for="file"
                             >Select file</label
                         >
                         <button
                             type="submit"
                             :disabled="!fileName"
-                            class="w-48 px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer hover:bg-green-600 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
+                            class="w-48 px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
                         >
                             Upload
                         </button>
@@ -88,20 +88,40 @@ export default {
         const onDragLeave = (event) => {
             isDragging.value = false;
         };
-        const onFileDropped = (event) => {
-            setFile(event);
+        const onFileDropped = async (event) => {
+            event.preventDefault();
             isDragging.value = false;
+            const { files } = event.dataTransfer || event.target;
+            let validated = await validateFile(files[0]);
+            console.log(validated);
+            if (!validated) {
+                alert("error");
+            } else {
+                file.value = files[0];
+                fileName.value = files[0].name;
+                // setFile(files[0]);
+            }
         };
-        const onChange = (event) => {
-            setFile(event);
-        };
-        const setFile = (event) => {
+        const onChange = async (event) => {
             event.preventDefault();
             const { files } = event.dataTransfer || event.target;
+            validateFile(files[0]);
             file.value = files[0];
             fileName.value = files[0].name;
-            console.log(file.value);
+            // setFile(files[0]);
         };
+        const validateFile = async (file) => {
+            console.log(file);
+            if (file.type != "text/csv") {
+                return false;
+            } else {
+                return true;
+            }
+        };
+        // const setFile = (file) => {
+        //     file.value = file;
+        //     fileName.value = file.name;
+        // };
         const uploadFile = () => {
             const form = useForm({
                 file,
