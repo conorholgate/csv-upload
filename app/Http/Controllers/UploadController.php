@@ -39,7 +39,10 @@ class UploadController extends Controller
         }
 
         // Return people array
-        return response()->json(['data' => $people]);
+        return redirect()->back()->with([
+            'message' => 'Installer was successfully deleted',
+        ]);
+       // return response()->json(['data' => $people]);
     }
     private function createPersonRecord($title, $last_name) {
         // Split the title into title and initial (if applicable)

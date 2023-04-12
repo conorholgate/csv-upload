@@ -4,7 +4,7 @@
             class="flex flex-col items-center justify-center min-h-screen gap-10 bg-gray-200"
         >
             <div
-                class="flex flex-col w-[50%] h-[50%] max-w-[900px] max-h-[700px]"
+                class="flex flex-col w-[70%] h-[50%] max-w-[900px] max-h-[700px]"
             >
                 <div
                     class="flex flex-col items-center p-4 rounded-lg bg-gray-50 min-w-[300px]"
@@ -29,7 +29,7 @@
                         @dragover.prevent
                         @dragenter="onDragEnter"
                         @dragleave="onDragLeave"
-                        @drop="onFileDropped"
+                        @drop="onChange"
                         class="z-50 mb-10 flex items-center text-center justify-center w-full p-4 text-2xl text-gray-400 bg-white border-4 border-dashed border-blue-400 rounded-lg h-[400px]"
                         :class="{
                             isDragging: isDragging,
@@ -59,12 +59,15 @@
                         >
                         <button
                             type="submit"
-                            :disabled="!fileName"
                             class="w-48 px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
                         >
                             Upload
                         </button>
                     </div>
+                    <!-- <progress :value="form.progress?.percentage" max="100">
+                        {{ form.progress?.percentage }}%
+                    </progress>
+                    <div>{{ form.errors }}</div> -->
                 </div>
             </div>
         </div>
@@ -81,6 +84,9 @@ export default {
         const file = ref(null);
         const isDragging = ref(false);
         const fileName = ref(null);
+        const form = useForm({
+            file,
+        });
 
         const onDragEnter = (event) => {
             isDragging.value = true;
@@ -88,45 +94,40 @@ export default {
         const onDragLeave = (event) => {
             isDragging.value = false;
         };
-        const onFileDropped = async (event) => {
+        const onChange = async (event) => {
             event.preventDefault();
+
             isDragging.value = false;
+
             const { files } = event.dataTransfer || event.target;
+
             let validated = await validateFile(files[0]);
-            console.log(validated);
+
             if (!validated) {
                 alert("error");
             } else {
                 file.value = files[0];
                 fileName.value = files[0].name;
-                // setFile(files[0]);
             }
         };
-        const onChange = async (event) => {
-            event.preventDefault();
-            const { files } = event.dataTransfer || event.target;
-            validateFile(files[0]);
-            file.value = files[0];
-            fileName.value = files[0].name;
-            // setFile(files[0]);
-        };
         const validateFile = async (file) => {
-            console.log(file);
             if (file.type != "text/csv") {
                 return false;
             } else {
                 return true;
             }
         };
-        // const setFile = (file) => {
-        //     file.value = file;
-        //     fileName.value = file.name;
-        // };
         const uploadFile = () => {
-            const form = useForm({
-                file,
+            form.post(route("file.upload"), {
+                preserveScroll: true,
+                onSuccess: () => success(),
+                onError: () => {},
             });
-            form.post(route("file.upload"));
+        };
+        const success = () => {
+            file.value = null;
+            fileName.value = null;
+            console.log("success");
         };
 
         return {
@@ -135,10 +136,10 @@ export default {
             file,
             isDragging,
             fileName,
-            onFileDropped,
             onDragEnter,
             onDragLeave,
             onChange,
+            form,
         };
     },
 };
