@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UploadController extends Controller
 {
@@ -39,9 +40,14 @@ class UploadController extends Controller
         }
 
         // Return people array
-        return redirect()->back()->with([
-            'message' => 'Installer was successfully deleted',
-        ]);
+        // return redirect()->back()->with([
+        //     'message' => 'Installer was successfully deleted',
+        // ]);
+
+        return Inertia::render('FileUpload', [
+            'people' => $people
+          ]);
+        
        // return response()->json(['data' => $people]);
     }
     private function createPersonRecord($title, $last_name) {

@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="uploadFile" enctype="multipart/form-data">
-        <!-- <div
+        <div
             class="flex flex-col items-center justify-center min-h-screen gap-10 bg-gray-200"
         >
             <div
@@ -64,16 +64,12 @@
                             Upload
                         </button>
                     </div>
-                    <!-- <progress :value="form.progress?.percentage" max="100">
-                        {{ form.progress?.percentage }}%
-                    </progress>
-                    <div>{{ form.errors }}</div> -->
                 </div>
-            </div>
-        </div> -->
-        <div v-if="people">
-            <div v-for="person in people" :key="person">
-                {{ person }}
+                <div class="bg-red-200">
+                    <div v-for="person in people" :key="person">
+                        {{ person }}
+                    </div>
+                </div>
             </div>
         </div>
     </form>
@@ -81,14 +77,13 @@
 
 <script>
 import { useForm } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 export default {
     props: {
         people: Array,
     },
     setup(props) {
-        console.log(props);
         const fileInput = ref(null);
         const file = ref(null);
         const isDragging = ref(false);
@@ -96,7 +91,7 @@ export default {
         const form = useForm({
             file,
         });
-        const people = ref(props.people);
+        const people = computed(() => props.people);
 
         const onDragEnter = (event) => {
             isDragging.value = true;
