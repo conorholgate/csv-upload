@@ -8,6 +8,9 @@ class UploadController extends Controller
 {
     public function upload(Request $request)
     {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt'
+        ]);
 
         $file = $request->files->get('file');
 
@@ -16,59 +19,72 @@ class UploadController extends Controller
         $data = array_slice($csv, 1);
 
         $people = [];
-        // Loop through the CSV data and create records for each person
-        foreach ($data as $row) {
-            // Split the name into title and last name
-            $name_parts = explode(' ', $row[0]);
-            $last_name = array_pop($name_parts);
-            $title = implode(' ', $name_parts);
+        foreach ($data as $personString) {
+            $titles = ["Mr", "Mrs", "Mister", "Dr", "Prof", "Ms"];
+            $title = null;
+            $initial = null;
+            $firstName = null;
+            $lastName = null;
 
-            // Check if the title contains "and" or "&"
-            if (strpos($title, ' and ') !== false || strpos($title, ' & ') !== false) {
-                // If the title contains "and" or "&", create records for each person
-                $names = preg_split('/\s+and\s+|\s+&\s+/', $title);
-                foreach ($names as $name) {
+            $personString = $personString[0];
 
-                    $person = $this->createPersonRecord($name, $last_name);
-                    $people[] = $person;
-                }
+            // replace & with and
+            $personString = str_replace('&', 'and', $personString);
+    
+            // Handle strings containing "and"
+            if (strpos($personString, " and ") !== false) {
+                $personStrings = explode(" and ", $personString);
             } else {
-                // If the title does not contain "and" or "&", create a record for the person
-                $person = $this->createPersonRecord($title, $last_name);
-                $people[] = $person;
+                $personStrings = [$personString];
+            }
+
+            foreach ($personStrings as $personString) {
+                // Split into words
+                $words = explode(" ", $personString);
+                // Get title
+                foreach ($titles as $possibleTitle) {
+                    if (in_array($possibleTitle, $words)) {
+                        $title = $possibleTitle;
+                        $words = array_values(array_diff($words, [$title]));
+                        break;
+                    }
+                }
+    
+                // Get initial
+                if (isset($words[0]) && preg_match("/^[A-Z]\.?$/", $words[0])) {
+                    $initial = $words[0];
+                    $words = array_slice($words, 1);
+                }
+    
+                // Get first and last name
+                if (count($words) > 1) {
+                    // dd($words);
+                    $firstName = array_shift($words);
+                    $lastName = array_pop($words);
+                    if (count($words) > 0) {
+                        $firstName .= " " . implode(" ", $words);
+                    }
+                } elseif (count($words) == 1) {
+                    $lastName = $words[0];
+                }
+    
+                // Store person
+                if ($title !== null && $lastName !== null) {
+                    $people[] = [
+                        "title" => $title,
+                        "initial" => $initial,
+                        "first_name" => $firstName,
+                        "last_name" => $lastName,
+                    ];
+                }
             }
         }
 
-        // Return people array
-        // return redirect()->back()->with([
-        //     'message' => 'Installer was successfully deleted',
-        // ]);
 
         return Inertia::render('FileUpload', [
             'people' => $people
           ]);
-        
-       // return response()->json(['data' => $people]);
-    }
-    private function createPersonRecord($title, $last_name) {
-        // Split the title into title and initial (if applicable)
-        $title_parts = explode(' ', $title);
-        $initial = null;
-        $first_name = null;
-        if (count($title_parts) > 1) {
-            $first_name = array_pop($title_parts);
-            $initial = substr($first_name, 0, 1);
-        }
-        $title = implode(' ', $title_parts);
     
-        // Create a new Person record
-        $person = [
-            'title' => $title,
-            'initial' => $initial,
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-        ];
-        return $person;
     }
 }
 

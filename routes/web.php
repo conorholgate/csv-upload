@@ -17,19 +17,19 @@ use Inertia\Inertia;
 |
 */
 
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-Route::get('/files/upload', function () {
     return Inertia::render('FileUpload');
 });
 
-Route::post('/files/upload', [UploadController::class, 'upload'])->name('file.upload');
+Route::post('/', [UploadController::class, 'upload'])->name('file.upload');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
