@@ -3,7 +3,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "test": "vitest --ui",
+        "test": "vitest",
+        "test:update": "vitest -u",
         "coverage": "vitest run --coverage"
     },
     "devDependencies": {
