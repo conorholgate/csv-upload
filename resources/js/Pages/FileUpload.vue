@@ -89,9 +89,13 @@
                         </button>
                     </div>
                 </div>
-                <div class="mt-10 text-center" v-if="form.processing">
+                <div class="mt-10 text-center" v-show="form.processing">
                     Uploading data...
                 </div>
+            </div>
+        </div>
+        <div class="flex justify-center w-full bg-gray-200 -mt-[100px]">
+            <div ref="table" class="w-[70%] max-w-[900px]">
                 <people-table
                     v-if="people?.length && !form.processing"
                     :people="people"
@@ -119,6 +123,7 @@ export default {
         const file = ref(null);
         const isDragging = ref(false);
         const fileName = ref(null);
+        const table = ref(null);
         const form = useForm({
             file,
         });
@@ -179,6 +184,9 @@ export default {
         const success = () => {
             file.value = null;
             fileName.value = null;
+            setTimeout(() => {
+                table.value.scrollIntoView({ behavior: "smooth" });
+            }, 100);
         };
         const removeFile = () => {
             file.value = null;
@@ -201,6 +209,7 @@ export default {
             processing,
             error,
             errorMessage,
+            table,
         };
     },
 };
