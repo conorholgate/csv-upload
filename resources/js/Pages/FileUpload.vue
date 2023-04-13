@@ -1,5 +1,9 @@
 <template>
-    <form @submit.prevent="uploadFile" enctype="multipart/form-data">
+    <form
+        @submit.prevent="uploadFile"
+        enctype="multipart/form-data"
+        :disabled="form.processing"
+    >
         <div
             class="flex flex-col items-center justify-center min-h-screen gap-10 bg-gray-200"
         >
@@ -79,13 +83,19 @@
                         <button
                             :disabled="!file || processing"
                             type="submit"
-                            class="w-full px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer md:w-48 hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
+                            class="w-full px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer md:w-48 hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400"
                         >
                             Upload
                         </button>
                     </div>
                 </div>
-                <people-table v-if="people?.length" :people="people" />
+                <div class="mt-10 text-center" v-if="form.processing">
+                    Uploading data...
+                </div>
+                <people-table
+                    v-if="people?.length && !form.processing"
+                    :people="people"
+                />
             </div>
         </div>
     </form>

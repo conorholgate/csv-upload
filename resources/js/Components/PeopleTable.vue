@@ -1,7 +1,7 @@
 <template>
     <div v-if="people?.length" class="mt-5 mb-10 text-gray-600">
         <div class="mb-2 text-xl">
-            <h1>Previous file uploaded data:</h1>
+            <h1>Successfully uploaded {{ people.length }} records</h1>
         </div>
         <div class="">
             <table class="w-full divide-y divide-gray-300 table-auto">
