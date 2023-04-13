@@ -10,7 +10,7 @@
                     <div
                         class="flex flex-col justify-between w-full h-24 mb-5 text-gray-600 self-baseline"
                     >
-                        <h1 class="text-xl">Files Upload</h1>
+                        <h1 class="self-center text-xl">Files Upload</h1>
                         <div class="flex justify-between">
                             <div class="flex items-center w-full">
                                 Files allowed:
@@ -68,16 +68,18 @@
                     >
                         <span><u>Remove file</u></span>
                     </div>
-                    <div class="flex justify-between w-full mt-14">
+                    <div
+                        class="flex flex-col justify-between w-full md:flex-row mt-14"
+                    >
                         <label
-                            class="w-48 px-4 py-2 mr-2 text-lg text-center text-white bg-blue-400 rounded-lg cursor-pointer hover:bg-blue-600 active:bg-blue-900"
+                            class="w-full px-4 py-2 mb-2 mr-2 text-lg text-center text-white bg-blue-400 rounded-lg cursor-pointer md:mb-0 md:w-48 hover:bg-blue-600 active:bg-blue-900"
                             for="file"
                             >Select file</label
                         >
                         <button
                             :disabled="!file || processing"
                             type="submit"
-                            class="w-48 px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
+                            class="w-full px-4 py-2 text-lg text-center text-white bg-green-400 border-none rounded-lg cursor-pointer md:w-48 hover:bg-green-600 active:bg-green-800 disabled:opacity-30 disabled:hover:bg-green-400 disabled:cursor-none"
                         >
                             Upload
                         </button>
