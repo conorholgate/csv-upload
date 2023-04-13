@@ -38,35 +38,52 @@ class UploadController extends Controller
                 $personStrings = [$personString];
             }
 
+            
+
             foreach ($personStrings as $personString) {
                 // Split into words
                 $words = explode(" ", $personString);
+                
+
                 // Get title
                 foreach ($titles as $possibleTitle) {
                     if (in_array($possibleTitle, $words)) {
                         $title = $possibleTitle;
-                        $words = array_values(array_diff($words, [$title]));
+                        // removes title from words
+                        if (count($words) > 1) {
+                            $words = array_values(array_diff($words, [$title]));
+                        }
                         break;
                     }
                 }
     
                 // Get initial
                 if (isset($words[0]) && preg_match("/^[A-Z]\.?$/", $words[0])) {
+                    // sets initial
                     $initial = $words[0];
+                    // removes initial from words
                     $words = array_slice($words, 1);
+                  
                 }
     
                 // Get first and last name
                 if (count($words) > 1) {
-                    // dd($words);
                     $firstName = array_shift($words);
                     $lastName = array_pop($words);
                     if (count($words) > 0) {
                         $firstName .= " " . implode(" ", $words);
                     }
                 } elseif (count($words) == 1) {
-                    $lastName = $words[0];
+                    if (count($personStrings) == 1) {
+                        $lastName = $words[0];
+                    } else {
+                        $potentialLastName = $personStrings[1];
+                        $parts = explode(" ", $potentialLastName);
+                        $lastName = end($parts);
+                    }
+                   
                 }
+                // dd($title, $lastName);
     
                 // Store person
                 if ($title !== null && $lastName !== null) {
