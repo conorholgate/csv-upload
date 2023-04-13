@@ -66,7 +66,7 @@
                     </transition>
 
                     <div
-                        v-if="file"
+                        v-if="file && !form.processing"
                         @click="removeFile"
                         class="flex justify-end w-full -mb-6 cursor-pointer"
                     >
